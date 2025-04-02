@@ -1,0 +1,5 @@
+# Ignorer les fichiers avec les suffixes spécifiques
+*_old.py
+*_[0-9][0-9][0-9][0-9][0-9][0-9].py  # Format _000000(date)
+*_[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9].py  # Format _00000000(date autre format)
+ile-de-france-latest.osm.pbf

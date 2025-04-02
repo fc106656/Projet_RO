@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projet d'Optimisation des Tournées - CESI CDP</title>
+    <style>
+        :root {
+            --cesi-blue: #004C96;
+            --cesi-light-blue: #007DC5;
+            --cesi-grey: #58585A;
+            --light-grey: #f5f5f5;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        header {
+            background-color: var(--cesi-blue);
+            color: white;
+            padding: 1rem 0;
+            text-align: center;
+            position: relative;
+        }
+        
+        .logo-container {
+            position: absolute;
+            top: 1rem;
+            left: 2rem;
+        }
+        
+        .logo {
+            max-width: 120px;
+            height: auto;
+        }
+        
+        .header-content {
+            padding-top: 1rem;
+        }
+        
+        h1 {
+            margin: 0;
+            font-size: 2.5rem;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            font-weight: 300;
+            margin-bottom: 1rem;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+        
+        section {
+            padding: 2rem 0;
+        }
+        
+        .hero-image {
+            width: 100%;
+            height: 400px;
+            background-image: url('/api/placeholder/1200/400');
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+        
+        .hero-overlay {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .section-title {
+            color: var(--cesi-blue);
+            border-bottom: 2px solid var(--cesi-light-blue);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .team-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1.5rem;
+            margin: 1rem 0;
+        }
+        
+        .team-member {
+            background-color: var(--light-grey);
+            border-radius: 8px;
+            padding: 1rem;
+            width: calc(25% - 2rem);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            min-width: 200px;
+            text-align: center;
+        }
+        
+        .team-member h3 {
+            margin-top: 0;
+            color: var(--cesi-blue);
+            font-size: 1.1rem;
+        }
+        
+        .team-member p {
+            font-size: 0.9rem;
+            margin: 0;
+        }
+        
+        .resources {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .resource-card {
+            flex: 1;
+            min-width: 250px;
+            background-color: var(--light-grey);
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .btn {
+            display: inline-block;
+            background-color: var(--cesi-blue);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+            margin-top: 1rem;
+        }
+        
+        .btn:hover {
+            background-color: var(--cesi-light-blue);
+        }
+        
+        .context {
+            background-color: var(--light-grey);
+            padding: 2rem;
+            border-radius: 8px;
+            margin: 2rem 0;
+        }
+        
+        .objective-card {
+            background-color: white;
+            border-left: 4px solid var(--cesi-blue);
+            padding: 1rem;
+            margin: 1rem 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .downloads {
+            margin: 2rem 0;
+        }
+        
+        .download-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background-color: var(--light-grey);
+            border-radius: 4px;
+        }
+        
+        .download-icon {
+            margin-right: 1rem;
+            font-size: 1.5rem;
+            color: var(--cesi-blue);
+        }
+        
+        .download-info {
+            flex-grow: 1;
+        }
+        
+        footer {
+            background-color: var(--cesi-grey);
+            color: white;
+            text-align: center;
+            padding: 1.5rem 0;
+            margin-top: 2rem;
+        }
+        
+        .tech-section {
+            text-align: center;
+            padding: 2rem 0;
+            background-color: var(--light-grey);
+        }
+        
+        .tech-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 3rem;
+            margin: 2rem 0;
+        }
+        
+        .tech-logo {
+            height: 80px;
+            transition: transform 0.3s;
+        }
+        
+        .tech-logo:hover {
+            transform: scale(1.1);
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .team-member {
+                width: calc(50% - 2rem);
+            }
+            
+            .logo-container {
+                position: relative;
+                top: 0;
+                left: 0;
+                margin-bottom: 1rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .team-member {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo-container">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSi6jTh-1egIrH6NTX0RgA9ayAWr_Dsq1fE0w&s" alt="Logo CESI" class="logo">
+            </div>
+            <div class="header-content">
+                <h1>Optimisation des Tournées de Livraison</h1>
+                <p class="subtitle">Un projet de recherche opérationnelle pour l'ADEME</p>
+            </div>
+        </div>
+    </header>
+    
+    <div class="hero-image" style="background-image: url('https://cdn.pixabay.com/photo/2018/11/25/01/41/europe-night-map-3836707_1280.jpg'); background-size: cover; background-position: top;">
+        <div class="hero-overlay">
+            <!-- Overlay content can be added here if needed -->
+        </div>
+    </div>
+    
+    <section>
+        <div class="container">
+            <h2 class="section-title">Contexte du Projet</h2>
+            
+            <div class="context">
+                <p>Dans le cadre d'un appel à manifestation d'intérêt lancé par l'ADEME (Agence de l'Environnement et de la Maîtrise de l'Energie), notre structure CesiCDP propose une solution pour optimiser les déplacements lors de tournées de livraison.</p>
+                
+                <h3>Problématique</h3>
+                <p>Développer des algorithmes qui permettent de calculer sur un réseau routier une tournée optimale reliant un sous-ensemble de villes, puis revenir au point de départ, afin de minimiser la durée totale du parcours.</p>
+                
+                <h3>Objectifs clés</h3>
+                <div class="objective-card">
+                    <p><strong>Modélisation du problème</strong> - Représentation formelle des données et objectifs à optimiser</p>
+                </div>
+                <div class="objective-card">
+                    <p><strong>Analyse de complexité</strong> - Étude théorique de la complexité du problème</p>
+                </div>
+                <div class="objective-card">
+                    <p><strong>Implémentation algorithmique</strong> - Développement en Python d'au moins deux méthodes de résolution</p>
+                </div>
+                <div class="objective-card">
+                    <p><strong>Étude statistique</strong> - Analyse du comportement expérimental des algorithmes développés</p>
+                </div>
+                <div class="objective-card">
+                    <p><strong>Contraintes supplémentaires</strong> - Intégration d'au moins deux contraintes additionnelles (fenêtres temporelles, restrictions de passage, etc.)</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section class="tech-section">
+        <div class="container">
+            <h2 class="section-title">Technologies Utilisées</h2>
+            <div class="tech-container">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Python-logo-notext.svg/1869px-Python-logo-notext.svg.png" alt="Python" class="tech-logo">
+                <img src="https://neo4j.com/wp-content/themes/neo4jweb/assets/images/neo4j-logo-2015.png" alt="Neo4j" class="tech-logo">
+                <img src="https://matplotlib.org/stable/_static/images/logo2.svg" alt="Matplotlib" class="tech-logo">
+                <img src="https://numpy.org/images/logo.svg" alt="NumPy" class="tech-logo">
+            </div>
+        </div>
+    </section>
+    
+    <section>
+        <div class="container">
+            <h2 class="section-title">Notre Équipe</h2>
+            <p>Nous sommes une équipe d'étudiants en 1ère année du cycle ingénieur en alternance (FISA A3) à CESI Nanterre.</p>
+            
+            <div class="team-container">
+                <div class="team-member">
+                    <h3>Clément Faux</h3>
+                    <p>FISA A3 - CESI Nanterre</p>
+                </div>
+                <div class="team-member">
+                    <h3>Julien Laudicina</h3>
+                    <p>FISA A3 - CESI Nanterre</p>
+                </div>
+                <div class="team-member">
+                    <h3>Claude Ajavon</h3>
+                    <p>FISA A3 - CESI Nanterre</p>
+                </div>
+                <div class="team-member">
+                    <h3>Sonia Reghis</h3>
+                    <p>FISA A3 - CESI Nanterre</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section>
+        <div class="container">
+            <h2 class="section-title">Ressources du Projet</h2>
+            
+            <div class="resources">
+                <div class="resource-card">
+                    <h3>Code Source</h3>
+                    <p>Consultez notre code et les différentes méthodes de résolution sur notre dépôt GitHub.</p>
+                    <a href="https://github.com/fc106656/Projet_RO" target="_blank" class="btn">Accéder au GitHub</a>
+                </div>
+                
+                <div class="resource-card">
+                    <h3>Suivi de Projet</h3>
+                    <p>Suivez notre avancement et l'organisation des tâches sur notre tableau Trello.</p>
+                    <a href="https://trello.com/b/pS4DJEIN/projetro" target="_blank" class="btn">Accéder au Trello</a>
+                </div>
+            </div>
+            
+            <div class="downloads">
+                <h3>Documents à télécharger</h3>
+                
+                <div class="download-item">
+                    <div class="download-icon">📊</div>
+                    <div class="download-info">
+                        <h4>Dataset d'expérimentation</h4>
+                        <p>Jeu de données utilisé pour tester nos algorithmes d'optimisation</p>
+                    </div>
+                    <a href="#" class="btn">Télécharger</a>
+                </div>
+                
+                <div class="download-item">
+                    <div class="download-icon">📑</div>
+                    <div class="download-info">
+                        <h4>Rapport de modélisation</h4>
+                        <p>Document détaillant notre approche de modélisation formelle du problème</p>
+                    </div>
+                    <a href="#" class="btn">Télécharger</a>
+                </div>
+                
+                <div class="download-item">
+                    <div class="download-icon">📝</div>
+                    <div class="download-info">
+                        <h4>Sujet complet du projet</h4>
+                        <p>Énoncé détaillé du projet fourni par l'ADEME</p>
+                    </div>
+                    <a href="#" class="btn">Télécharger</a>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 - Projet d'Optimisation des Tournées - CESI Nanterre</p>
+        </div>
+    </footer>
+</body>
+</html>
