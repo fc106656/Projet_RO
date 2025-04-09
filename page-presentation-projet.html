@@ -242,6 +242,43 @@
                 width: 100%;
             }
         }
+
+        /* Tab styles */
+        .tabs {
+            margin: 2rem 0;
+        }
+
+        .tab-buttons {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+
+        .tab-button {
+            padding: 1rem 2rem;
+            background-color: var(--light-grey);
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--cesi-grey);
+            transition: all 0.3s ease;
+        }
+
+        .tab-button.active {
+            background-color: white;
+            border-bottom: 3px solid var(--cesi-blue);
+            color: var(--cesi-blue);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -262,130 +299,246 @@
             <!-- Overlay content can be added here if needed -->
         </div>
     </div>
-    
-    <section>
-        <div class="container">
-            <h2 class="section-title">Contexte du Projet</h2>
-            
-            <div class="context">
-                <p>Dans le cadre d'un appel à manifestation d'intérêt lancé par l'ADEME (Agence de l'Environnement et de la Maîtrise de l'Energie), notre structure CesiCDP propose une solution pour optimiser les déplacements lors de tournées de livraison.</p>
-                
-                <h3>Problématique</h3>
-                <p>Développer des algorithmes qui permettent de calculer sur un réseau routier une tournée optimale reliant un sous-ensemble de villes, puis revenir au point de départ, afin de minimiser la durée totale du parcours.</p>
-                
-                <h3>Objectifs clés</h3>
-                <div class="objective-card">
-                    <p><strong>Modélisation du problème</strong> - Représentation formelle des données et objectifs à optimiser</p>
-                </div>
-                <div class="objective-card">
-                    <p><strong>Analyse de complexité</strong> - Étude théorique de la complexité du problème</p>
-                </div>
-                <div class="objective-card">
-                    <p><strong>Implémentation algorithmique</strong> - Développement en Python d'au moins deux méthodes de résolution</p>
-                </div>
-                <div class="objective-card">
-                    <p><strong>Étude statistique</strong> - Analyse du comportement expérimental des algorithmes développés</p>
-                </div>
-                <div class="objective-card">
-                    <p><strong>Contraintes supplémentaires</strong> - Intégration d'au moins deux contraintes additionnelles (fenêtres temporelles, restrictions de passage, etc.)</p>
-                </div>
-            </div>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active" onclick="openTab('presentation')">Présentation</button>
+            <button class="tab-button" onclick="openTab('recherches')">Nos Recherches</button>
+            <button class="tab-button" onclick="openTab('livrable1')">Livrable 1</button>
         </div>
-    </section>
-    
-    <section class="tech-section">
-        <div class="container">
-            <h2 class="section-title">Technologies Utilisées</h2>
-            <div class="tech-container">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Python-logo-notext.svg/1869px-Python-logo-notext.svg.png" alt="Python" class="tech-logo">
-                <img src="https://neo4j.com/wp-content/themes/neo4jweb/assets/images/neo4j-logo-2015.png" alt="Neo4j" class="tech-logo">
-                <img src="https://matplotlib.org/stable/_static/images/logo2.svg" alt="Matplotlib" class="tech-logo">
-                <img src="https://numpy.org/images/logo.svg" alt="NumPy" class="tech-logo">
-            </div>
-        </div>
-    </section>
-    
-    <section>
-        <div class="container">
-            <h2 class="section-title">Notre Équipe</h2>
-            <p>Nous sommes une équipe d'étudiants en 1ère année du cycle ingénieur en alternance (FISA A3) à CESI Nanterre.</p>
-            
-            <div class="team-container">
-                <div class="team-member">
-                    <h3>Clément Faux</h3>
-                    <p>FISA A3 - CESI Nanterre</p>
-                </div>
-                <div class="team-member">
-                    <h3>Julien Laudicina</h3>
-                    <p>FISA A3 - CESI Nanterre</p>
-                </div>
-                <div class="team-member">
-                    <h3>Claude Ajavon</h3>
-                    <p>FISA A3 - CESI Nanterre</p>
-                </div>
-                <div class="team-member">
-                    <h3>Sonia Reghis</h3>
-                    <p>FISA A3 - CESI Nanterre</p>
-                </div>
-            </div>
-        </div>
-    </section>
-    
-    <section>
-        <div class="container">
-            <h2 class="section-title">Ressources du Projet</h2>
-            
-            <div class="resources">
-                <div class="resource-card">
-                    <h3>Code Source</h3>
-                    <p>Consultez notre code et les différentes méthodes de résolution sur notre dépôt GitHub.</p>
-                    <a href="https://github.com/fc106656/Projet_RO" target="_blank" class="btn">Accéder au GitHub</a>
-                </div>
-                
-                <div class="resource-card">
-                    <h3>Suivi de Projet</h3>
-                    <p>Suivez notre avancement et l'organisation des tâches sur notre tableau Trello.</p>
-                    <a href="https://trello.com/b/pS4DJEIN/projetro" target="_blank" class="btn">Accéder au Trello</a>
-                </div>
-            </div>
-            
-            <div class="downloads">
-                <h3>Documents à télécharger</h3>
-                
-                <div class="download-item">
-                    <div class="download-icon">📊</div>
-                    <div class="download-info">
-                        <h4>Dataset d'expérimentation</h4>
-                        <p>Jeu de données utilisé pour tester nos algorithmes d'optimisation</p>
+
+        <div id="presentation" class="tab-content active">
+            <section>
+                <div class="container">
+                    <h2 class="section-title">Contexte du Projet</h2>
+                    
+                    <div class="context">
+                        <p>Dans le cadre d'un appel à manifestation d'intérêt lancé par l'ADEME (Agence de l'Environnement et de la Maîtrise de l'Energie), notre structure CesiCDP propose une solution pour optimiser les déplacements lors de tournées de livraison.</p>
+                        
+                        <h3>Problématique</h3>
+                        <p>Développer des algorithmes qui permettent de calculer sur un réseau routier une tournée optimale reliant un sous-ensemble de villes, puis revenir au point de départ, afin de minimiser la durée totale du parcours.</p>
+                        
+                        <h3>Objectifs clés</h3>
+                        <div class="objective-card">
+                            <p><strong>Modélisation du problème</strong> - Représentation formelle des données et objectifs à optimiser</p>
+                        </div>
+                        <div class="objective-card">
+                            <p><strong>Analyse de complexité</strong> - Étude théorique de la complexité du problème</p>
+                        </div>
+                        <div class="objective-card">
+                            <p><strong>Implémentation algorithmique</strong> - Développement en Python d'au moins deux méthodes de résolution</p>
+                        </div>
+                        <div class="objective-card">
+                            <p><strong>Étude statistique</strong> - Analyse du comportement expérimental des algorithmes développés</p>
+                        </div>
+                        <div class="objective-card">
+                            <p><strong>Contraintes supplémentaires</strong> - Intégration d'au moins deux contraintes additionnelles (fenêtres temporelles, restrictions de passage, etc.)</p>
+                        </div>
                     </div>
-                    <a href="#" class="btn">Télécharger</a>
                 </div>
-                
-                <div class="download-item">
-                    <div class="download-icon">📑</div>
-                    <div class="download-info">
-                        <h4>Rapport de modélisation</h4>
-                        <p>Document détaillant notre approche de modélisation formelle du problème</p>
+            </section>
+            
+            <section class="tech-section">
+                <div class="container">
+                    <h2 class="section-title">Technologies Utilisées</h2>
+                    <div class="tech-container">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Python-logo-notext.svg/1869px-Python-logo-notext.svg.png" alt="Python" class="tech-logo">
+                        <img src="https://neo4j.com/wp-content/themes/neo4jweb/assets/images/neo4j-logo-2015.png" alt="Neo4j" class="tech-logo">
+                        <img src="https://matplotlib.org/stable/_static/images/logo2.svg" alt="Matplotlib" class="tech-logo">
+                        <img src="https://numpy.org/images/logo.svg" alt="NumPy" class="tech-logo">
                     </div>
-                    <a href="#" class="btn">Télécharger</a>
                 </div>
-                
-                <div class="download-item">
-                    <div class="download-icon">📝</div>
-                    <div class="download-info">
-                        <h4>Sujet complet du projet</h4>
-                        <p>Énoncé détaillé du projet fourni par l'ADEME</p>
+            </section>
+            
+            <section>
+                <div class="container">
+                    <h2 class="section-title">Notre Équipe</h2>
+                    <p>Nous sommes une équipe d'étudiants en 1ère année du cycle ingénieur en alternance (FISA A3) à CESI Nanterre.</p>
+                    
+                    <div class="team-container">
+                        <div class="team-member">
+                            <h3>Clément Faux</h3>
+                            <p>FISA A3 - CESI Nanterre</p>
+                        </div>
+                        <div class="team-member">
+                            <h3>Julien Laudicina</h3>
+                            <p>FISA A3 - CESI Nanterre</p>
+                        </div>
+                        <div class="team-member">
+                            <h3>Claude Ajavon</h3>
+                            <p>FISA A3 - CESI Nanterre</p>
+                        </div>
+                        <div class="team-member">
+                            <h3>Sonia Reghis</h3>
+                            <p>FISA A3 - CESI Nanterre</p>
+                        </div>
                     </div>
-                    <a href="#" class="btn">Télécharger</a>
                 </div>
-            </div>
+            </section>
+            
+            <section>
+                <div class="container">
+                    <h2 class="section-title">Ressources du Projet</h2>
+                    
+                    <div class="resources">
+                        <div class="resource-card">
+                            <h3>Code Source</h3>
+                            <p>Consultez notre code et les différentes méthodes de résolution sur notre dépôt GitHub.</p>
+                            <a href="https://github.com/fc106656/Projet_RO" target="_blank" class="btn">Accéder au GitHub</a>
+                        </div>
+                        
+                        <div class="resource-card">
+                            <h3>Suivi de Projet</h3>
+                            <p>Suivez notre avancement et l'organisation des tâches sur notre tableau Trello.</p>
+                            <a href="https://trello.com/b/pS4DJEIN/projetro" target="_blank" class="btn">Accéder au Trello</a>
+                        </div>
+                    </div>
+                    
+                    <div class="downloads">
+                        <h3>Documents à télécharger</h3>
+                        
+                        <div class="download-item">
+                            <div class="download-icon">📊</div>
+                            <div class="download-info">
+                                <h4>Dataset d'expérimentation</h4>
+                                <p>Jeu de données utilisé pour tester nos algorithmes d'optimisation</p>
+                            </div>
+                            <a href="#" class="btn">Télécharger</a>
+                        </div>
+                        
+                        <div class="download-item">
+                            <div class="download-icon">📑</div>
+                            <div class="download-info">
+                                <h4>Rapport de modélisation</h4>
+                                <p>Document détaillant notre approche de modélisation formelle du problème</p>
+                            </div>
+                            <a href="#" class="btn">Télécharger</a>
+                        </div>
+                        
+                        <div class="download-item">
+                            <div class="download-icon">📝</div>
+                            <div class="download-info">
+                                <h4>Sujet complet du projet</h4>
+                                <p>Énoncé détaillé du projet fourni par l'ADEME</p>
+                            </div>
+                            <a href="#" class="btn">Télécharger</a>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </div>
-    </section>
+
+        <div id="recherches" class="tab-content">
+            <section>
+                <div class="container">
+                    <h2 class="section-title">Nos Recherches</h2>
+                    
+                    <div class="context">
+                        <h3>Documents de Recherche</h3>
+                        <p>Consultez nos documents de recherche sur les différents aspects du problème d'optimisation des tournées.</p>
+                        
+                        <div class="downloads">
+                            <div class="download-item">
+                                <div class="download-icon">📚</div>
+                                <div class="download-info">
+                                    <h4>Théorie des Graphes : Problèmes NP-complets</h4>
+                                    <p>Analyse des problèmes NP-complets dans le contexte de la théorie des graphes et leur application à l'optimisation des tournées</p>
+                                </div>
+                                <a href="theorie_graphes_np_complets.html" target="_blank" class="btn">Ouvrir</a>
+                            </div>
+                        </div>
+
+                        <div class="objective-card">
+                            <h4>À venir</h4>
+                            <p>D'autres documents de recherche seront ajoutés au fur et à mesure de l'avancement de nos travaux.</p>
+                            <!-- <ul>
+                                <li>Analyse des algorithmes d'approximation</li>
+                                <li>Étude des méthodes métaheuristiques</li>
+                                <li>Comparaison des performances des différents algorithmes</li>
+                            </ul> -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <div id="livrable1" class="tab-content">
+            <section>
+                <div class="container">
+                    <h2 class="section-title">Livrable 1</h2>
+                    
+                    <div class="context">
+                        <h3>Modélisation du Problème</h3>
+                        <p>Dans cette section, nous présentons notre première livraison concernant la modélisation du problème d'optimisation des tournées.</p>
+                        
+                        <!-- <div class="downloads">
+                            <div class="download-item">
+                                <div class="download-icon">📄</div>
+                                <div class="download-info">
+                                    <h4>Rapport de Modélisation</h4>
+                                    <p>Document détaillant notre approche de modélisation formelle du problème</p>
+                                </div>
+                                <a href="#" class="btn">Ouvrir</a>
+                            </div>
+
+                            <div class="download-item">
+                                <div class="download-icon">📊</div>
+                                <div class="download-info">
+                                    <h4>Jeu de Données</h4>
+                                    <p>Données utilisées pour la modélisation et les tests</p>
+                                </div>
+                                <a href="#" class="btn">Ouvrir</a>
+                            </div>
+
+                            <div class="download-item">
+                                <div class="download-icon">💻</div>
+                                <div class="download-info">
+                                    <h4>Code Source</h4>
+                                    <p>Implémentation de la modélisation en Python</p>
+                                </div>
+                                <a href="#" class="btn">Ouvrir</a>
+                            </div>
+                        </div>
+
+                        <div class="objective-card">
+                            <h4>Contenu du Livrable</h4>
+                            <ul>
+                                <li>Analyse formelle du problème</li>
+                                <li>Modélisation mathématique</li>
+                                <li>Structure de données</li>
+                                <li>Premières implémentations</li>
+                            </ul>
+                        </div> -->
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
     
     <footer>
         <div class="container">
             <p>&copy; 2025 - Projet d'Optimisation des Tournées - CESI Nanterre</p>
         </div>
     </footer>
+
+    <script>
+        function openTab(tabName) {
+            // Hide all tab contents
+            const tabContents = document.getElementsByClassName('tab-content');
+            for (let i = 0; i < tabContents.length; i++) {
+                tabContents[i].classList.remove('active');
+            }
+            
+            // Remove active class from all buttons
+            const tabButtons = document.getElementsByClassName('tab-button');
+            for (let i = 0; i < tabButtons.length; i++) {
+                tabButtons[i].classList.remove('active');
+            }
+            
+            // Show the selected tab content and activate its button
+            document.getElementById(tabName).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+    </script>
 </body>
 </html>

@@ -1,0 +1,1962 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coloration de Graphe - Outil Interactif</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8f9fa;
+        }
+        .header-section {
+            background-color: #4B5563;
+            color: white;
+            padding: 60px 0;
+            margin-bottom: 30px;
+        }
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 25px;
+            border: none;
+        }
+        .card-header {
+            background-color: #4B5563;
+            color: white;
+            font-weight: bold;
+            border-top-left-radius: 10px !important;
+            border-top-right-radius: 10px !important;
+        }
+        .concept-card {
+            background-color: #f1f7ff;
+        }
+        .algorithm-card {
+            background-color: #fff7f0;
+        }
+        .interactive-card {
+            background-color: #f0faf4;
+        }
+        .highlight {
+            background-color: #ffffcc;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+        .callout {
+            padding: 15px;
+            border-left: 5px solid #4B5563;
+            background-color: #e9ecef;
+            border-radius: 4px;
+            margin: 15px 0;
+        }
+        .formula {
+            background-color: #f7f7f9;
+            padding: 10px;
+            border-radius: 5px;
+            border-left: 3px solid #6c757d;
+            font-family: 'Courier New', monospace;
+        }
+        #table-of-contents {
+            position: sticky;
+            top: 20px;
+        }
+        .toc-link {
+            text-decoration: none;
+            color: #4B5563;
+            display: block;
+            padding: 8px 15px;
+            border-left: 2px solid transparent;
+            transition: all 0.3s;
+        }
+        .toc-link:hover {
+            background-color: #f1f1f1;
+            border-left: 2px solid #4B5563;
+        }
+        .toc-h2 {
+            padding-left: 15px;
+            font-size: 0.9rem;
+        }
+        #graph-canvas {
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            cursor: crosshair;
+            touch-action: none;
+        }
+        .btn-mode {
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+        .btn-mode.active {
+            background-color: #4B5563;
+            color: white;
+        }
+        .step-description {
+            height: 80px;
+            overflow-y: auto;
+        }
+        .control-panel {
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        .node {
+            cursor: move;
+        }
+        .color-indicator {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin-right: 5px;
+            border: 1px solid #ddd;
+        }
+        #algorithm-steps {
+            height: 250px;
+            overflow-y: auto;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #fff;
+        }
+        .step-item {
+            padding: 8px;
+            margin-bottom: 5px;
+            border-radius: 4px;
+        }
+        .step-item.current {
+            background-color: #e9ecef;
+            border-left: 3px solid #4B5563;
+        }
+        .instructions {
+            background-color: #e9ecef;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+        #node-info {
+            margin-top: 15px;
+        }
+        .diagram-title {
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .reduction-diagram {
+            margin: 20px 0;
+            width: 100%;
+            overflow-x: auto;
+        }
+        .reduction-diagram svg {
+            min-width: 800px;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+        .diagram-text {
+            font-size: 12px;
+            font-family: Arial, sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <div class="header-section">
+        <div class="container">
+            <h1 class="display-4"><i class="fas fa-project-diagram me-3"></i>Théorie des Graphes : Problèmes NP-complets</h1>
+            <p class="lead">Exploration interactive de la coloration, des cycles eulériens et hamiltoniens</p>
+        </div>
+    </div>
+
+    <div class="container mb-5">
+        <div class="row">
+            <!-- Table of Contents -->
+            <div class="col-lg-3">
+                <div class="card" id="table-of-contents">
+                    <div class="card-header">Sommaire</div>
+                    <div class="card-body">
+                        <a href="#intro" class="toc-link">Introduction</a>
+                        <a href="#definitions" class="toc-link">Définitions</a>
+                        <a href="#algorithms" class="toc-link">Algorithmes</a>
+                        <a href="#mathematical-proofs" class="toc-link">Démonstrations Mathématiques</a>
+                        <a href="#interactive-tool" class="toc-link">Outil Interactif</a>
+                        <a href="#implementation" class="toc-link">Implémentation Python</a>
+                        <a href="#applications" class="toc-link">Applications</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-lg-9">
+                <!-- Introduction -->
+                <section id="intro">
+                    <div class="card concept-card">
+                        <div class="card-header">
+                            <i class="fas fa-info-circle me-2"></i>Introduction
+                        </div>
+                        <div class="card-body">
+                            <p>La théorie des graphes nous offre des outils puissants pour modéliser et résoudre des problèmes complexes. Cet outil interactif explore trois problèmes fondamentaux :</p>
+                            
+                            <div class="row mt-4">
+                                <div class="col-md-4">
+                                    <div class="card h-100">
+                                        <div class="card-body">
+                                            <h5><i class="fas fa-palette me-2"></i>Coloration de Graphe</h5>
+                                            <p>Attribution de couleurs aux sommets d'un graphe de sorte que deux sommets adjacents n'aient jamais la même couleur. Un problème classique avec des applications pratiques comme l'allocation de ressources.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card h-100">
+                                        <div class="card-body">
+                                            <h5><i class="fas fa-route me-2"></i>Cycle Eulérien</h5>
+                                            <p>Recherche d'un cycle passant une et une seule fois par chaque arête du graphe. Ce problème, inspiré des ponts de Königsberg, est résolvable en temps polynomial.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card h-100">
+                                        <div class="card-body">
+                                            <h5><i class="fas fa-map-marked-alt me-2"></i>Cycle Hamiltonien</h5>
+                                            <p>Recherche d'un cycle passant une et une seule fois par chaque sommet du graphe. Un problème NP-complet, proche du célèbre problème du voyageur de commerce.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="callout mt-4">
+                                <h5><i class="fas fa-lightbulb me-2"></i>Points clés</h5>
+                                <p>Ces trois problèmes illustrent parfaitement la diversité de la complexité en théorie des graphes :</p>
+                                <ul>
+                                    <li>Le cycle eulérien est résolvable efficacement (temps polynomial)</li>
+                                    <li>La coloration et le cycle hamiltonien sont NP-complets</li>
+                                    <li>Chacun nécessite des approches et des structures de données différentes</li>
+                                </ul>
+                                <p>À travers cet outil interactif, nous explorerons ces problèmes, leurs démonstrations mathématiques et leurs implications pratiques.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Definitions -->
+                <section id="definitions">
+                    <div class="card concept-card">
+                        <div class="card-header">
+                            <i class="fas fa-book me-2"></i>Définitions
+                        </div>
+                        <div class="card-body">
+                            <dl>
+                                <dt>Coloration de graphe</dt>
+                                <dd>Attribution de couleurs aux sommets d'un graphe telle que deux sommets adjacents n'aient jamais la même couleur.</dd>
+                                
+                                <dt>Nombre chromatique (χ(G))</dt>
+                                <dd>Le nombre minimum de couleurs nécessaires pour colorier tous les sommets d'un graphe G.</dd>
+                                
+                                <dt>Coloration propre</dt>
+                                <dd>Une coloration où aucune paire de sommets adjacents ne partage la même couleur.</dd>
+                                
+                                <dt>Degré d'un sommet</dt>
+                                <dd>Le nombre d'arêtes connectées à ce sommet, ou de manière équivalente, le nombre de voisins du sommet.</dd>
+
+                                <dt>Réduction polynomiale (≤ₚ)</dt>
+                                <dd>
+                                    Une transformation d'un problème A vers un problème B en temps polynomial, notée A ≤ₚ B, qui permet de résoudre A en utilisant une solution de B. Plus formellement :
+                                    <div class="formula mt-2">
+                                        A ≤ₚ B signifie qu'il existe une fonction f calculable en temps polynomial telle que :
+                                        <br>x ∈ A ⟺ f(x) ∈ B
+                                    </div>
+                                    <div class="callout mt-2">
+                                        <strong>Exemple :</strong> Le problème SAT peut être réduit polynomialement au problème du cycle hamiltonien en transformant chaque clause en un "gadget" de graphe spécifique.
+                                    </div>
+                                </dd>
+
+                                <dt>NP-complétude</dt>
+                                <dd>
+                                    Un problème P est NP-complet s'il satisfait deux conditions :
+                                    <ol>
+                                        <li><strong>P ∈ NP</strong> : Une solution peut être vérifiée en temps polynomial</li>
+                                        <li><strong>P est NP-difficile</strong> : Tout problème de NP peut être réduit polynomialement à P</li>
+                                    </ol>
+                                    <div class="callout mt-2">
+                                        <strong>Implications :</strong>
+                                        <ul>
+                                            <li>Si on trouve un algorithme polynomial pour un problème NP-complet, alors P = NP</li>
+                                            <li>Les problèmes NP-complets sont considérés comme "intrinsèquement difficiles"</li>
+                                            <li>En pratique, on utilise des heuristiques ou des algorithmes d'approximation</li>
+                                        </ul>
+                                    </div>
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Algorithms -->
+                <section id="algorithms">
+                    <div class="card algorithm-card">
+                        <div class="card-header">
+                            <i class="fas fa-code me-2"></i>Algorithmes
+                        </div>
+                        <div class="card-body">
+                            <!-- Algorithme de Coloration -->
+                            <h4>Algorithme de Coloration</h4>
+                            
+                            <h5 class="mt-4">Algorithme Glouton</h5>
+                            <p>L'<strong>algorithme glouton</strong> pour la coloration de graphe est une approche simple mais efficace. Il parcourt les sommets dans un ordre donné et attribue à chaque sommet la plus petite couleur disponible qui n'est pas utilisée par ses voisins.</p>
+                            
+                            <div class="formula">
+                                <pre><code>Fonction ColoreGlouton(G):
+    Pour chaque sommet v dans G:
+        couleurs_disponibles = {0, 1, 2, ...}
+        Pour chaque voisin u de v:
+            Si u est déjà coloré:
+                Retirer couleur[u] de couleurs_disponibles
+        couleur[v] = plus petite couleur de couleurs_disponibles
+    Retourner couleur</code></pre>
+                            </div>
+
+                            <!-- Algorithme de Parcours Eulérien -->
+                            <h4 class="mt-5">Algorithme de Parcours Eulérien</h4>
+                            
+                            <h5 class="mt-4">Algorithme de Hierholzer</h5>
+                            <div class="formula">
+                                <pre><code>Fonction TrouveCycleEulerien(G, sommet_depart):
+    cycle = []
+    pile = [sommet_depart]
+    
+    Tant que pile non vide:
+        sommet_courant = sommet au sommet de la pile
+        Si degré(sommet_courant) > 0:
+            Choisir une arête non visitée e = (sommet_courant, v)
+            Supprimer l'arête e
+            Empiler v sur la pile
+        Sinon:
+            Dépiler sommet_courant et l'ajouter au début de cycle
+    
+    Retourner cycle</code></pre>
+                            </div>
+
+                            <!-- Algorithme de Parcours Hamiltonien -->
+                            <h4 class="mt-5">Algorithme de Parcours Hamiltonien</h4>
+                            
+                            <h5 class="mt-4">Algorithme de Backtracking</h5>
+                            <div class="formula">
+                                <pre><code>Fonction TrouveCycleHamiltonien(G, sommet_depart):
+    chemin = [sommet_depart]
+    visites = {sommet_depart}
+    
+    Fonction backtrack(chemin, visites):
+        Si len(chemin) == nombre_sommets:
+            Si existe_arete(dernier_sommet, sommet_depart):
+                Retourner chemin + [sommet_depart]
+            Retourner null
+            
+        Pour chaque voisin v de dernier_sommet:
+            Si v non dans visites:
+                Ajouter v au chemin et aux visités
+                resultat = backtrack(chemin, visites)
+                Si resultat non null:
+                    Retourner resultat
+                Retirer v du chemin et des visités
+        
+        Retourner null
+    
+    Retourner backtrack(chemin, visites)</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Mathematical Proofs -->
+                <section id="mathematical-proofs">
+                    <div class="card concept-card">
+                        <div class="card-header">
+                            <i class="fas fa-square-root-alt me-2"></i>Démonstrations Mathématiques
+                        </div>
+                        <div class="card-body">
+                            <h4>Introduction au Problème</h4>
+                            <div class="formula mb-4">
+                                <h5>Le Problème du Voyageur de Commerce (TSP)</h5>
+                                <p>Imaginons un voyageur qui doit visiter plusieurs villes. Il veut :</p>
+                                <ul>
+                                    <li>Visiter chaque ville exactement une fois</li>
+                                    <li>Revenir à son point de départ</li>
+                                    <li>Trouver le chemin le plus court possible</li>
+                                </ul>
+
+                                <h5 class="mt-3">Formalisation du problème</h5>
+                                <p><strong>G = (V, E)</strong> représente notre carte :</p>
+                                <ul>
+                                    <li>V : l'ensemble des villes (sommets)</li>
+                                    <li>E : l'ensemble des routes entre les villes (arêtes)</li>
+                                </ul>
+                                
+                                <h5 class="mt-3">Conditions d'un cycle hamiltonien</h5>
+                                <ol>
+                                    <li><strong>∀i ∈ [1,n-1], (vᵢ, vᵢ₊₁) ∈ E</strong>
+                                        <br><em>→ Il doit exister une route entre chaque paire de villes consécutives</em>
+                                    </li>
+                                    <li><strong>(vₙ, v₁) ∈ E</strong>
+                                        <br><em>→ Il doit exister une route pour revenir au point de départ</em>
+                                    </li>
+                                    <li><strong>∀i,j ∈ [1,n], i ≠ j ⟹ vᵢ ≠ vⱼ</strong>
+                                        <br><em>→ Chaque ville ne doit être visitée qu'une seule fois</em>
+                                    </li>
+                                </ol>
+                            </div>
+
+                            <h4>Explosion Combinatoire</h4>
+                            <div class="formula mb-4">
+                                <h5>Nombre de solutions possibles</h5>
+                                <p>Pour un graphe de n sommets :</p>
+                                <ul>
+                                    <li>Nombre de chemins possibles = (n-1)!</li>
+                                    <li>Avec 5 villes : 4! = 24 chemins possibles</li>
+                                    <li>Avec 10 villes : 9! = 362.880 chemins possibles</li>
+                                    <li>Avec 20 villes : 19! = 121.645.100.408.832.000 chemins possibles</li>
+                                </ul>
+
+                                <h5 class="mt-3">Temps de calcul en pratique</h5>
+                                <p>Avec un ordinateur effectuant 1 milliard d'opérations par seconde :</p>
+                                <ul>
+                                    <li><strong>10 villes</strong> : environ 3.6 microsecondes
+                                        <br><em>→ Plus rapide qu'un battement de cils</em>
+                                    </li>
+                                    <li><strong>20 villes</strong> : environ 77 ans
+                                        <br><em>→ Plus qu'une vie humaine</em>
+                                    </li>
+                                    <li><strong>30 villes</strong> : environ 8.4 × 10¹⁵ années
+                                        <br><em>→ Plus que l'âge de l'univers (13.8 × 10⁹ années)</em>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <h4>Classes de Complexité</h4>
+                            <div class="formula mb-4">
+                                <h5>Définitions fondamentales</h5>
+                                <ul>
+                                    <li><strong>P</strong> : Problèmes résolvables en temps polynomial
+                                        <br><em>Exemple : Tri d'un tableau en O(n log n)</em>
+                                    </li>
+                                    <li><strong>NP</strong> : Problèmes dont une solution peut être vérifiée en temps polynomial
+                                        <br><em>Exemple : Vérifier si un chemin est hamiltonien en O(n)</em>
+                                    </li>
+                                    <li><strong>NP-complet</strong> : Problèmes les plus difficiles de NP
+                                        <br><em>Si on résout l'un d'eux en polynomial, on les résout tous</em>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div class="text-center mb-4">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/f/f4/P_np_fr.svg" alt="Diagramme des classes de complexité P et NP" class="img-fluid" style="max-width: 600px;">
+                                <p class="text-muted mt-2"><small>Diagramme illustrant les relations entre les classes de complexité P et NP</small></p>
+                            </div>
+
+                            <h4>Réduction Polynomiale</h4>
+                            <div class="formula mb-4">
+                                <h5>Principe de réduction</h5>
+                                <p>Pour prouver qu'un problème A est NP-complet :</p>
+                                <ol>
+                                    <li>Montrer que A est dans NP</li>
+                                    <li>Réduire un problème NP-complet connu B vers A</li>
+                                </ol>
+                                <p>Notation : B ≤ₚ A (B se réduit polynomialement à A)</p>
+
+                                <h5>Exemple avec le cycle hamiltonien</h5>
+                                <p>Réduction du problème SAT vers le cycle hamiltonien :</p>
+                                <div class="formula">
+                                    <div class="reduction-diagram">
+                                        <svg viewBox="0 0 800 500" preserveAspectRatio="xMidYMid meet" style="background: white; border: 1px solid #ddd; border-radius: 5px;">
+                                            <!-- Variable gadget -->
+                                            <g transform="translate(100,80)" class="diagram-text">
+                                                <text x="0" y="-30" class="diagram-title">Gadget Variable (x₁)</text>
+                                                <!-- True path -->
+                                                <path d="M 0,0 L 200,0" stroke="#4CAF50" stroke-width="2" fill="none"/>
+                                                <text x="100" y="-20" text-anchor="middle" fill="#4CAF50">x₁ = vrai</text>
+                                                <!-- False path -->
+                                                <path d="M 0,50 L 200,50" stroke="#f44336" stroke-width="2" fill="none"/>
+                                                <text x="100" y="70" text-anchor="middle" fill="#f44336">x₁ = faux</text>
+                                                <!-- Vertical connections -->
+                                                <path d="M 0,0 L 0,50" stroke="#666" stroke-width="2" fill="none"/>
+                                                <path d="M 200,0 L 200,50" stroke="#666" stroke-width="2" fill="none"/>
+                                                <!-- Nodes -->
+                                                <circle cx="0" cy="0" r="4" fill="#333"/>
+                                                <circle cx="200" cy="0" r="4" fill="#333"/>
+                                                <circle cx="0" cy="50" r="4" fill="#333"/>
+                                                <circle cx="200" cy="50" r="4" fill="#333"/>
+                                            </g>
+
+                                            <!-- Clause gadget -->
+                                            <g transform="translate(100,250)" class="diagram-text">
+                                                <text x="0" y="-30" class="diagram-title">Gadget Clause (x₁ ∨ x₂ ∨ x₃)</text>
+                                                <!-- Clause vertices -->
+                                                <circle cx="100" cy="50" r="20" fill="#fff" stroke="#333"/>
+                                                <text x="100" y="55" text-anchor="middle">C₁</text>
+                                                <!-- Connections to variables -->
+                                                <path d="M 100,30 L 100,-70" stroke="#666" stroke-width="2" stroke-dasharray="4" fill="none"/>
+                                                <text x="120" y="-20" fill="#666">Connexions aux littéraux</text>
+                                            </g>
+
+                                            <!-- Complete graph example -->
+                                            <g transform="translate(450,250)" class="diagram-text">
+                                                <text x="0" y="-30" class="diagram-title">Graphe Final</text>
+                                                <!-- Example of final structure -->
+                                                <path d="M 50,50 C 100,0 150,0 200,50" stroke="#333" stroke-width="2" fill="none"/>
+                                                <path d="M 50,50 C 100,100 150,100 200,50" stroke="#333" stroke-width="2" fill="none"/>
+                                                <circle cx="50" cy="50" r="4" fill="#333"/>
+                                                <circle cx="200" cy="50" r="4" fill="#333"/>
+                                                <text x="125" y="100" text-anchor="middle">Cycle hamiltonien possible</text>
+                                            </g>
+
+                                            <!-- Legend -->
+                                            <g transform="translate(100,400)" class="diagram-text">
+                                                <text x="0" y="0" class="diagram-title" font-size="16">Légende :</text>
+                                                <g transform="translate(0,30)">
+                                                    <rect x="0" y="0" width="15" height="15" fill="#4CAF50"/>
+                                                    <text x="25" y="12">Chemin vrai</text>
+                                                </g>
+                                                <g transform="translate(200,30)">
+                                                    <rect x="0" y="0" width="15" height="15" fill="#f44336"/>
+                                                    <text x="25" y="12">Chemin faux</text>
+                                                </g>
+                                                <g transform="translate(400,30)">
+                                                    <rect x="0" y="0" width="15" height="15" fill="none" stroke="#666" stroke-dasharray="4"/>
+                                                    <text x="25" y="12">Connexion clause-variable</text>
+                                                </g>
+                                            </g>
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <h4>Preuve de NP-complétude du Cycle Hamiltonien</h4>
+                            <div class="formula mb-4">
+                                <h5>1. Appartenance à NP</h5>
+                                <p>Un cycle hamiltonien peut être vérifié en temps polynomial :</p>
+                                <ul>
+                                    <li>Vérifier que chaque sommet apparaît une fois : O(n)</li>
+                                    <li>Vérifier que les arêtes existent : O(n)</li>
+                                    <li>Vérifier que c'est un cycle : O(n)</li>
+                                </ul>
+
+                                <h5>2. Réduction de 3-SAT vers Cycle Hamiltonien</h5>
+                                <p>Construction du graphe G à partir d'une formule 3-SAT :</p>
+                                <ol>
+                                    <li>Pour chaque variable x_i :
+                                        <br>Créer un sous-graphe de sélection avec deux chemins
+                                    </li>
+                                    <li>Pour chaque clause (l_i ∨ l_j ∨ l_k) :
+                                        <br>Créer un sommet de clause connecté aux littéraux
+                                    </li>
+                                    <li>Ajouter des arêtes de connexion entre les gadgets</li>
+                                </ol>
+
+                                <h5>Équivalence</h5>
+                                <p>⟹ Si la formule est satisfiable, il existe un cycle hamiltonien
+                                <br>⟸ Si un cycle hamiltonien existe, la formule est satisfiable</p>
+                            </div>
+
+                            <h4>Implications Pratiques</h4>
+                            <div class="formula mb-4">
+                                <h5>Conséquences de la NP-complétude</h5>
+                                <ul>
+                                    <li>Pas d'algorithme polynomial connu</li>
+                                    <li>Si P ≠ NP (conjecture), pas de solution efficace possible</li>
+                                    <li>Nécessité d'utiliser des heuristiques</li>
+                                </ul>
+
+                                <h5>Complexité en pratique</h5>
+                                <p>Pour n villes :</p>
+                                <ul>
+                                    <li>Algorithme exact : O(n!)</li>
+                                    <li>Plus proche voisin : O(n²)</li>
+                                    <li>2-approximation : O(n²log n)</li>
+                                </ul>
+                            </div>
+
+                            <div class="callout">
+                                <h5>Conclusion</h5>
+                                <p>La NP-complétude du problème du cycle hamiltonien n'est pas qu'une curiosité théorique. Elle explique pourquoi :</p>
+                                <ul>
+                                    <li>Les solutions exactes sont impraticables pour de grandes instances</li>
+                                    <li>Les algorithmes approximatifs sont nécessaires en pratique</li>
+                                    <li>La recherche continue pour améliorer les heuristiques</li>
+                                </ul>
+                            </div>
+
+                            <div class="text-center mt-4">
+                                <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#explanationModal">
+                                    <i class="fas fa-question-circle me-2"></i>Je n'ai pas compris
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Interactive Tool -->
+                <section id="interactive-tool">
+                    <div class="card interactive-card">
+                        <div class="card-header">
+                            <i class="fas fa-pencil-ruler me-2"></i>Outil Interactif
+                        </div>
+                        <div class="card-body">
+                            <div class="control-panel mb-3">
+                                <div class="toolbar p-2 bg-light border rounded">
+                                    <!-- Groupe d'édition -->
+                                    <div class="btn-toolbar mb-2" role="toolbar">
+                                        <div class="btn-group me-3" role="group" aria-label="Outils d'édition">
+                                            <button id="btn-add-node" class="btn btn-outline-primary btn-mode active" data-bs-toggle="tooltip" title="Ajouter des nœuds">
+                                                <i class="fas fa-plus-circle"></i>
+                                            </button>
+                                            <button id="btn-add-edge" class="btn btn-outline-primary btn-mode" data-bs-toggle="tooltip" title="Ajouter des arêtes">
+                                                <i class="fas fa-link"></i>
+                                            </button>
+                                            <button id="btn-move" class="btn btn-outline-primary btn-mode" data-bs-toggle="tooltip" title="Déplacer les nœuds">
+                                                <i class="fas fa-arrows-alt"></i>
+                                            </button>
+                                            <button id="btn-delete" class="btn btn-outline-danger btn-mode" data-bs-toggle="tooltip" title="Supprimer">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+
+                                        <div class="btn-group me-3" role="group" aria-label="Algorithmes de coloration">
+                                            <button id="btn-color-graph" class="btn btn-success" data-bs-toggle="tooltip" title="Lancer la coloration">
+                                                <i class="fas fa-palette me-1"></i> Colorier
+                                            </button>
+                                            <button id="btn-step" class="btn btn-outline-success" disabled data-bs-toggle="tooltip" title="Coloration pas à pas">
+                                                <i class="fas fa-step-forward"></i>
+                                            </button>
+                                            <button id="btn-auto" class="btn btn-outline-success" disabled data-bs-toggle="tooltip" title="Coloration automatique">
+                                                <i class="fas fa-play"></i>
+                                            </button>
+                                        </div>
+
+                                        <div class="btn-group me-3" role="group" aria-label="Cycles">
+                                            <div class="btn-group" role="group">
+                                                <button id="btn-check-euler" class="btn btn-info" data-bs-toggle="tooltip" title="Vérifier cycle eulérien">
+                                                    <i class="fas fa-route me-1"></i> Eulérien
+                                                </button>
+                                                <button id="btn-find-path" class="btn btn-outline-info" disabled>
+                                                    <i class="fas fa-search"></i>
+                                                </button>
+                                                <select id="start-node" class="form-select form-select-sm d-inline-block" style="width: auto;" disabled>
+                                                    <option value="">Départ...</option>
+                                                </select>
+                                                <button id="btn-clear-path" class="btn btn-outline-danger" disabled>
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </div>
+                                            <div class="btn-group ms-2" role="group">
+                                                <button id="btn-check-hamilton" class="btn btn-info" data-bs-toggle="tooltip" title="Vérifier cycle hamiltonien">
+                                                    <i class="fas fa-map-marked-alt me-1"></i> Hamiltonien
+                                                </button>
+                                                <button id="btn-find-hamilton" class="btn btn-outline-info" disabled>
+                                                    <i class="fas fa-search"></i>
+                                                </button>
+                                                <select id="start-node-hamilton" class="form-select form-select-sm d-inline-block" style="width: auto;" disabled>
+                                                    <option value="">Départ...</option>
+                                                </select>
+                                                <button id="btn-clear-hamilton" class="btn btn-outline-danger" disabled>
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <div class="btn-group" role="group" aria-label="Actions">
+                                            <button id="btn-reset" class="btn btn-outline-danger" data-bs-toggle="tooltip" title="Réinitialiser">
+                                                <i class="fas fa-redo"></i>
+                                            </button>
+                                            <button id="btn-tool-help" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#toolHelpModal" title="Aide sur l'outil">
+                                                <i class="fas fa-question-circle"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Options -->
+                                    <div class="d-flex align-items-center">
+                                        <div class="form-check me-3">
+                                            <input class="form-check-input" type="checkbox" id="check-degree" checked>
+                                            <label class="form-check-label" for="check-degree">
+                                                <i class="fas fa-sort-amount-down me-1"></i>Utiliser l'heuristique du degré décroissant
+                                            </label>
+                                        </div>
+                                        <div id="node-info">
+                                            <small class="text-muted">
+                                                <i class="fas fa-info-circle me-1"></i>
+                                                Nœuds: <span id="node-count" class="badge bg-secondary">0</span>
+                                                Arêtes: <span id="edge-count" class="badge bg-secondary">0</span>
+                                                Couleurs: <span id="color-count" class="badge bg-secondary">0</span>
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <canvas id="graph-canvas" width="600" height="400"></canvas>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card">
+                                        <div class="card-header">Étapes d'exécution</div>
+                                        <div class="card-body p-2">
+                                            <div id="algorithm-steps">
+                                                <p class="text-muted">Cliquez sur "Colorier le graphe" pour voir les étapes d'exécution.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-3">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <i class="fas fa-info-circle me-2"></i>Résultat
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="result-content">
+                                            <p class="text-muted mb-0">Aucune opération effectuée.</p>
+                                        </div>
+                                        <div id="color-legend" class="mt-3"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Implementation -->
+                <section id="implementation">
+                    <div class="card algorithm-card">
+                        <div class="card-header">
+                            <i class="fab fa-python me-2"></i>Implémentation Python
+                        </div>
+                        <div class="card-body">
+                            <p>Voici l'implémentation optimisée de l'algorithme glouton en Python :</p>
+                            
+                            <pre><code class="language-python">def greedy_coloring(graph):
+    """
+    Implémentation optimisée de l'algorithme glouton pour la coloration de graphe.
+    
+    Args:
+        graph: Un objet NetworkX Graph
+        
+    Returns:
+        Un dictionnaire avec les nœuds comme clés et leurs couleurs comme valeurs
+    """
+    # Initialisation du dictionnaire de couleurs
+    colors = {}
+    
+    # Trier les nœuds par degré décroissant (heuristique)
+    nodes = sorted(graph.nodes(), key=lambda x: graph.degree(x), reverse=True)
+    
+    for node in nodes:
+        # Ensemble des couleurs déjà utilisées par les voisins
+        neighbor_colors = {colors.get(neighbor) for neighbor in graph.neighbors(node) 
+                          if neighbor in colors}
+        
+        # Trouver la première couleur disponible
+        color = 0
+        while color in neighbor_colors:
+            color += 1
+            
+        # Assigner cette couleur au nœud
+        colors[node] = color
+    
+    return colors</code></pre>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Applications -->
+                <section id="applications">
+                    <div class="card concept-card">
+                        <div class="card-header">
+                            <i class="fas fa-briefcase me-2"></i>Applications
+                        </div>
+                        <div class="card-body">
+                            <p>La coloration de graphe trouve de nombreuses applications pratiques :</p>
+                            
+                            <div class="row mt-3">
+                                <div class="col-md-4 mb-3">
+                                    <div class="card h-100">
+                                        <div class="card-body">
+                                            <h5 class="card-title"><i class="fas fa-calendar-alt me-2"></i>Planification</h5>
+                                            <p class="card-text">Attribution d'horaires, de salles, ou de fréquences pour éviter les conflits.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <div class="card h-100">
+                                        <div class="card-body">
+                                            <h5 class="card-title"><i class="fas fa-network-wired me-2"></i>Réseaux</h5>
+                                            <p class="card-text">Attribution de fréquences dans les réseaux sans fil, répartition des canaux WiFi.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <div class="card h-100">
+                                        <div class="card-body">
+                                            <h5 class="card-title"><i class="fas fa-microchip me-2"></i>Compilation</h5>
+                                            <p class="card-text">Allocation de registres dans les compilateurs pour optimiser l'utilisation des ressources.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-dark text-white py-4 mt-5">
+        <div class="container text-center">
+            <p>© 2025 - Outil interactif de coloration de graphe</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Configuration du canvas et du contexte
+            const canvas = document.getElementById("graph-canvas");
+            const ctx = canvas.getContext("2d");
+            
+            // Variables pour stocker les données du graphe
+            let nodes = [];
+            let edges = [];
+            let colors = {};
+            let nodeIdCounter = 0;
+            let nodeRadius = 20;
+            
+            // État actuel de l'outil
+            let currentMode = "add-node"; // add-node, add-edge, move, delete
+            let selectedNode = null;
+            let selectedEdgeStart = null;
+            let draggingNode = null;
+            let isDragging = false;
+            let coloringInProgress = false;
+            let coloringSteps = [];
+            let currentStepIndex = -1;
+            
+            // Nouvelles variables pour le chemin eulérien
+            let eulerianPath = [];
+            let isShowingPath = false;
+
+            // Variables pour le cycle hamiltonien
+            let hamiltonianCycle = [];
+            let isShowingHamiltonianCycle = false;
+            
+            // Palette de couleurs
+            const colorPalette = [
+                "#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd", 
+                "#8c564b", "#e377c2", "#7f7f7f", "#bcbd22", "#17becf"
+            ];
+            
+            // Configuration des boutons de mode
+            document.getElementById("btn-add-node").addEventListener("click", () => setMode("add-node"));
+            document.getElementById("btn-add-edge").addEventListener("click", () => setMode("add-edge"));
+            document.getElementById("btn-move").addEventListener("click", () => setMode("move"));
+            document.getElementById("btn-delete").addEventListener("click", () => setMode("delete"));
+            
+            // Configuration des boutons d'action
+            document.getElementById("btn-color-graph").addEventListener("click", startColoring);
+            document.getElementById("btn-step").addEventListener("click", executeNextStep);
+            document.getElementById("btn-reset").addEventListener("click", resetGraph);
+            document.getElementById("btn-auto").addEventListener("click", autoColoring);
+            
+            // Configuration des écouteurs d'événements pour le canvas
+            canvas.addEventListener("mousedown", handleMouseDown);
+            canvas.addEventListener("mousemove", handleMouseMove);
+            canvas.addEventListener("mouseup", handleMouseUp);
+            canvas.addEventListener("touchstart", handleTouchStart, false);
+            canvas.addEventListener("touchmove", handleTouchMove, false);
+            canvas.addEventListener("touchend", handleTouchEnd, false);
+            
+            // Nouveaux écouteurs d'événements pour les fonctionnalités eulériennes
+            document.getElementById("btn-check-euler").addEventListener("click", () => {
+                const isEuler = isEulerian();
+                if (isEuler) {
+                    alert("Le graphe est eulérien !");
+                    document.getElementById("btn-find-path").disabled = false;
+                    document.getElementById("start-node").disabled = false;
+                    updateStartNodeSelect();
+                } else {
+                    alert("Le graphe n'est pas eulérien (certains sommets ont un degré impair).");
+                    document.getElementById("btn-find-path").disabled = true;
+                    document.getElementById("start-node").disabled = true;
+                }
+            });
+
+            document.getElementById("btn-find-path").addEventListener("click", () => {
+                const startNodeSelect = document.getElementById("start-node");
+                const startNodeId = startNodeSelect.value ? parseInt(startNodeSelect.value) : undefined;
+                eulerianPath = findEulerianPath(startNodeId);
+                isShowingPath = true;
+                document.getElementById("btn-clear-path").disabled = false;
+                currentStepIndex = coloringSteps.length - 1;
+                updateAlgorithmSteps();
+                redrawCanvas();
+            });
+
+            document.getElementById("btn-clear-path").addEventListener("click", () => {
+                eulerianPath = [];
+                isShowingPath = false;
+                document.getElementById("btn-clear-path").disabled = true;
+                redrawCanvas();
+            });
+            
+            // Fonction pour définir le mode actuel
+            function setMode(mode) {
+                currentMode = mode;
+                document.querySelectorAll(".btn-mode").forEach(btn => btn.classList.remove("active"));
+                document.getElementById(`btn-${mode}`).classList.add("active");
+                
+                if (mode !== "add-edge") {
+                    selectedEdgeStart = null;
+                }
+                
+                redrawCanvas();
+            }
+            
+            // Fonction pour ajouter un nœud
+            function addNode(x, y) {
+                const id = nodeIdCounter++;
+                nodes.push({ id, x, y, label: id.toString() });
+                updateNodeInfo();
+                redrawCanvas();
+            }
+            
+            // Fonction pour ajouter une arête
+            function addEdge(node1, node2) {
+                // Vérifier si l'arête existe déjà
+                if (!edges.some(e => 
+                    (e.source === node1.id && e.target === node2.id) || 
+                    (e.source === node2.id && e.target === node1.id))) {
+                    edges.push({ source: node1.id, target: node2.id });
+                    updateNodeInfo();
+                    redrawCanvas();
+                }
+            }
+            
+            // Fonction pour renuméroter les nœuds
+            function renumberNodes() {
+                nodes.sort((a, b) => a.id - b.id);
+                nodes.forEach((node, index) => {
+                    node.id = index;
+                    node.label = index.toString();
+                });
+                nodeIdCounter = nodes.length;
+            }
+            
+            // Fonction pour supprimer un nœud
+            function deleteNode(node) {
+                // Supprimer le nœud
+                nodes = nodes.filter(n => n.id !== node.id);
+                
+                // Supprimer toutes les arêtes connectées à ce nœud
+                edges = edges.filter(e => e.source !== node.id && e.target !== node.id);
+                
+                // Supprimer la couleur de ce nœud
+                if (node.id in colors) {
+                    delete colors[node.id];
+                }
+                
+                // Renuméroter les nœuds
+                renumberNodes();
+                
+                updateNodeInfo();
+                redrawCanvas();
+            }
+            
+            // Fonction pour supprimer une arête
+            function deleteEdge(edge) {
+                edges = edges.filter(e => 
+                    !(e.source === edge.source && e.target === edge.target) && 
+                    !(e.source === edge.target && e.target === edge.source));
+                
+                updateNodeInfo();
+                redrawCanvas();
+            }
+            
+            // Fonction pour trouver un nœud à des coordonnées spécifiques
+            function findNodeAt(x, y) {
+                return nodes.find(node => {
+                    const distance = Math.sqrt(Math.pow(node.x - x, 2) + Math.pow(node.y - y, 2));
+                    return distance <= nodeRadius;
+                });
+            }
+            
+            // Fonction pour trouver une arête à des coordonnées spécifiques
+            function findEdgeAt(x, y) {
+                for (const edge of edges) {
+                    const source = nodes.find(n => n.id === edge.source);
+                    const target = nodes.find(n => n.id === edge.target);
+                    
+                    if (!source || !target) continue;
+                    
+                    // Calculer la distance du point (x, y) à la ligne entre source et target
+                    const dx = target.x - source.x;
+                    const dy = target.y - source.y;
+                    const len = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (len === 0) continue;
+                    
+                    // Calculer la projection du point sur la ligne
+                    const proj = ((x - source.x) * dx + (y - source.y) * dy) / (len * len);
+                    
+                    if (proj < 0 || proj > 1) continue;
+                    
+                    // Calculer la distance perpendiculaire
+                    const projX = source.x + proj * dx;
+                    const projY = source.y + proj * dy;
+                    const distance = Math.sqrt(Math.pow(x - projX, 2) + Math.pow(y - projY, 2));
+                    
+                    if (distance <= 10) {
+                        return edge;
+                    }
+                }
+                return null;
+            }
+            
+            // Variables pour stocker la dernière position de la souris
+            let lastMouseX = 0;
+            let lastMouseY = 0;
+            
+            // Gestionnaire d'événements pour mousedown
+            function handleMouseDown(e) {
+                const rect = canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                lastMouseX = x;
+                lastMouseY = y;
+                
+                const clickedNode = findNodeAt(x, y);
+                
+                switch (currentMode) {
+                    case "add-node":
+                        if (!clickedNode) {
+                            addNode(x, y);
+                        }
+                        break;
+                    case "add-edge":
+                        if (clickedNode) {
+                            if (!selectedEdgeStart) {
+                                selectedEdgeStart = clickedNode;
+                            } else if (selectedEdgeStart !== clickedNode) {
+                                addEdge(selectedEdgeStart, clickedNode);
+                                selectedEdgeStart = null;
+                            }
+                        }
+                        break;
+                    case "move":
+                        if (clickedNode) {
+                            draggingNode = clickedNode;
+                            isDragging = true;
+                        }
+                        break;
+                    case "delete":
+                        if (clickedNode) {
+                            deleteNode(clickedNode);
+                        } else {
+                            const clickedEdge = findEdgeAt(x, y);
+                            if (clickedEdge) {
+                                deleteEdge(clickedEdge);
+                            }
+                        }
+                        break;
+                }
+                
+                redrawCanvas();
+            }
+            
+            // Gestionnaire d'événements pour mousemove
+            function handleMouseMove(e) {
+                const rect = canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                lastMouseX = x;
+                lastMouseY = y;
+                
+                if (isDragging && draggingNode) {
+                    draggingNode.x = x;
+                    draggingNode.y = y;
+                    redrawCanvas();
+                }
+            }
+            
+            // Gestionnaire d'événements pour mouseup
+            function handleMouseUp() {
+                isDragging = false;
+                draggingNode = null;
+            }
+            
+            // Gestionnaires d'événements tactiles
+            function handleTouchStart(e) {
+                e.preventDefault();
+                const touch = e.touches[0];
+                const rect = canvas.getBoundingClientRect();
+                const x = touch.clientX - rect.left;
+                const y = touch.clientY - rect.top;
+                handleMouseDown({ clientX: touch.clientX, clientY: touch.clientY });
+            }
+            
+            function handleTouchMove(e) {
+                e.preventDefault();
+                const touch = e.touches[0];
+                handleMouseMove({ clientX: touch.clientX, clientY: touch.clientY });
+            }
+            
+            function handleTouchEnd(e) {
+                e.preventDefault();
+                handleMouseUp();
+            }
+            
+            // Fonction pour mettre à jour les informations sur le graphe
+            function updateNodeInfo() {
+                document.getElementById("node-count").textContent = nodes.length;
+                document.getElementById("edge-count").textContent = edges.length;
+                document.getElementById("color-count").textContent = new Set(Object.values(colors)).size;
+            }
+            
+            // Fonction pour démarrer la coloration
+            function startColoring() {
+                if (nodes.length === 0) {
+                    updateResult('Veuillez ajouter des nœuds au graphe.', 'warning');
+                    return;
+                }
+                
+                // Réinitialiser les couleurs
+                colors = {};
+                
+                // Préparer les étapes de coloration
+                coloringSteps = [];
+                currentStepIndex = -1;
+                
+                // Trier les nœuds par degré décroissant si l'option est activée
+                const useDegreeHeuristic = document.getElementById("check-degree").checked;
+                let nodesToColor = [...nodes];
+                
+                if (useDegreeHeuristic) {
+                    nodesToColor.sort((a, b) => {
+                        const degreeA = edges.filter(e => e.source === a.id || e.target === a.id).length;
+                        const degreeB = edges.filter(e => e.source === b.id || e.target === b.id).length;
+                        return degreeB - degreeA;
+                    });
+                    updateResult('Coloration en cours avec l\'heuristique du degré décroissant...', 'info');
+                } else {
+                    updateResult('Coloration en cours...', 'info');
+                }
+                
+                // Générer les étapes de coloration
+                nodesToColor.forEach(node => {
+                    const step = {
+                        node: node,
+                        neighbors: edges
+                            .filter(e => e.source === node.id || e.target === node.id)
+                            .map(e => e.source === node.id ? e.target : e.source)
+                            .map(id => nodes.find(n => n.id === id))
+                    };
+                    coloringSteps.push(step);
+                });
+                
+                // Activer les boutons de contrôle
+                document.getElementById("btn-step").disabled = false;
+                document.getElementById("btn-auto").disabled = false;
+                
+                // Mettre à jour l'interface
+                updateAlgorithmSteps();
+                redrawCanvas();
+            }
+            
+            // Fonction pour exécuter l'étape suivante
+            function executeNextStep() {
+                if (currentStepIndex < coloringSteps.length - 1) {
+                    currentStepIndex++;
+                    const step = coloringSteps[currentStepIndex];
+                    
+                    // Trouver la plus petite couleur disponible
+                    const usedColors = new Set();
+                    step.neighbors.forEach(neighbor => {
+                        if (neighbor.id in colors) {
+                            usedColors.add(colors[neighbor.id]);
+                        }
+                    });
+                    
+                    let color = 0;
+                    while (usedColors.has(color)) {
+                        color++;
+                    }
+                    
+                    // Assigner la couleur
+                    colors[step.node.id] = color;
+                    
+                    // Mettre à jour l'interface
+                    updateAlgorithmSteps();
+                    updateNodeInfo();
+                    redrawCanvas();
+                    
+                    // Mettre à jour le résultat
+                    if (currentStepIndex === coloringSteps.length - 1) {
+                        const numColors = new Set(Object.values(colors)).size;
+                        updateResult(`Coloration terminée avec ${numColors} couleurs.`, 'success');
+                        updateColorLegend();
+                    } else {
+                        updateResult(`Coloration du nœud ${step.node.label} avec la couleur ${color}...`, 'info');
+                    }
+                    
+                    // Désactiver les boutons si c'était la dernière étape
+                    if (currentStepIndex === coloringSteps.length - 1) {
+                        document.getElementById("btn-step").disabled = true;
+                        document.getElementById("btn-auto").disabled = true;
+                    }
+                }
+            }
+            
+            // Fonction pour la coloration automatique
+            function autoColoring() {
+                while (currentStepIndex < coloringSteps.length - 1) {
+                    executeNextStep();
+                }
+            }
+            
+            // Fonction pour réinitialiser le graphe
+            function resetGraph() {
+                nodes = [];
+                edges = [];
+                colors = {};
+                nodeIdCounter = 0;
+                selectedEdgeStart = null;
+                draggingNode = null;
+                isDragging = false;
+                coloringInProgress = false;
+                coloringSteps = [];
+                currentStepIndex = -1;
+                eulerianPath = [];
+                isShowingPath = false;
+                hamiltonianCycle = null;
+                isShowingHamiltonianCycle = false;
+                
+                // Réinitialiser les sélecteurs
+                document.getElementById("start-node").innerHTML = '<option value="">Point de départ...</option>';
+                document.getElementById("start-node-hamilton").innerHTML = '<option value="">Point de départ...</option>';
+                
+                // Désactiver les boutons
+                document.getElementById("btn-step").disabled = true;
+                document.getElementById("btn-auto").disabled = true;
+                document.getElementById("btn-find-path").disabled = true;
+                document.getElementById("start-node").disabled = true;
+                document.getElementById("btn-clear-path").disabled = true;
+                document.getElementById("btn-find-hamilton").disabled = true;
+                document.getElementById("start-node-hamilton").disabled = true;
+                document.getElementById("btn-clear-hamilton").disabled = true;
+                
+                // Mettre à jour l'interface
+                updateNodeInfo();
+                updateAlgorithmSteps();
+                redrawCanvas();
+            }
+            
+            // Fonction pour mettre à jour l'affichage des étapes
+            function updateAlgorithmSteps() {
+                const stepsContainer = document.getElementById("algorithm-steps");
+                stepsContainer.innerHTML = "";
+                
+                if (coloringSteps.length === 0) {
+                    stepsContainer.innerHTML = "<p class='text-muted'>Cliquez sur 'Colorier le graphe' ou 'Trouver Chemin' pour voir les étapes d'exécution.</p>";
+                    return;
+                }
+                
+                coloringSteps.forEach((step, index) => {
+                    const stepElement = document.createElement("div");
+                    stepElement.className = `step-item ${index === currentStepIndex ? "current" : ""}`;
+                    
+                    if (step.description) {
+                        // Étape du chemin eulérien
+                        stepElement.innerHTML = step.description;
+                    } else {
+                        // Étape de coloration (code existant)
+                        if (index <= currentStepIndex) {
+                            const color = colors[step.node.id];
+                            stepElement.innerHTML = `
+                                <strong>Nœud ${step.node.label}</strong> : 
+                                Couleur ${color} <span class="color-indicator" style="background-color: ${colorPalette[color % colorPalette.length]}"></span>
+                            `;
+                        } else {
+                            stepElement.innerHTML = `<strong>Nœud ${step.node.label}</strong> : En attente`;
+                        }
+                    }
+                    
+                    stepsContainer.appendChild(stepElement);
+                });
+            }
+            
+            // Fonction pour vérifier si le graphe est eulérien
+            function isEulerian() {
+                // Vérifier que tous les sommets ont un degré pair
+                for (let node of nodes) {
+                    const degree = edges.filter(e => 
+                        e.source === node.id || e.target === node.id
+                    ).length;
+                    if (degree % 2 !== 0) {
+                        updateResult('Le graphe n\'est pas eulérien (certains sommets ont un degré impair).', 'warning');
+                        return false;
+                    }
+                }
+                updateResult('Le graphe est eulérien ! Vous pouvez maintenant chercher un cycle.', 'success');
+                return true;
+            }
+
+            // Fonction pour trouver un chemin eulérien
+            function findEulerianPath(startNodeId) {
+                // Réinitialiser les étapes
+                coloringSteps = [];
+                currentStepIndex = -1;
+                
+                // Si aucun sommet n'est sélectionné, prendre le premier
+                if (startNodeId === undefined || startNodeId === "") {
+                    startNodeId = nodes[0].id;
+                }
+                
+                let remainingEdges = [...edges];
+                let path = [];
+                let currentNode = startNodeId;
+                
+                // Ajouter l'étape initiale
+                coloringSteps.push({
+                    description: `Début du parcours au sommet ${currentNode}`,
+                    path: [...path]
+                });
+                
+                function findNextEdge(nodeId) {
+                    return remainingEdges.find(e => 
+                        e.source === nodeId || e.target === nodeId
+                    );
+                }
+                
+                while (remainingEdges.length > 0) {
+                    const nextEdge = findNextEdge(currentNode);
+                    if (!nextEdge) break;
+                    
+                    // Supprimer l'arête utilisée
+                    remainingEdges = remainingEdges.filter(e => e !== nextEdge);
+                    
+                    // Ajouter le nœud au chemin
+                    path.push(currentNode);
+                    
+                    // Passer au nœud suivant
+                    const nextNode = nextEdge.source === currentNode ? nextEdge.target : nextEdge.source;
+                    
+                    // Ajouter l'étape
+                    coloringSteps.push({
+                        description: `Passage du sommet ${currentNode} au sommet ${nextNode}`,
+                        path: [...path]
+                    });
+                    
+                    currentNode = nextNode;
+                }
+                
+                // Ajouter le dernier nœud
+                path.push(currentNode);
+                coloringSteps.push({
+                    description: `Fin du parcours au sommet ${currentNode}`,
+                    path: [...path]
+                });
+                
+                return path;
+            }
+
+            // Fonction pour dessiner une flèche avec numéro
+            function drawArrow(fromX, fromY, toX, toY, number, color) {
+                const headLength = 15;
+                const angle = Math.atan2(toY - fromY, toX - fromX);
+                
+                // Calculer le point d'arrivée de la flèche (légèrement avant le nœud)
+                const nodeRadius = 20;
+                const endX = toX - nodeRadius * Math.cos(angle);
+                const endY = toY - nodeRadius * Math.sin(angle);
+                
+                // Dessiner la ligne
+                ctx.beginPath();
+                ctx.moveTo(fromX, fromY);
+                ctx.lineTo(endX, endY);
+                ctx.strokeStyle = color;
+                ctx.stroke();
+                
+                // Dessiner la tête de flèche
+                ctx.beginPath();
+                ctx.moveTo(endX, endY);
+                ctx.lineTo(
+                    endX - headLength * Math.cos(angle - Math.PI/6),
+                    endY - headLength * Math.sin(angle - Math.PI/6)
+                );
+                ctx.lineTo(
+                    endX - headLength * Math.cos(angle + Math.PI/6),
+                    endY - headLength * Math.sin(angle + Math.PI/6)
+                );
+                ctx.fillStyle = color;
+                ctx.fill();
+                
+                // Calculer la position du numéro (décalé perpendiculairement à la flèche)
+                const midX = (fromX + toX) / 2;
+                const midY = (fromY + toY) / 2;
+                const offset = 8; // Réduit de 15 à 8 pixels
+                const perpX = -Math.sin(angle) * offset;
+                const perpY = Math.cos(angle) * offset;
+                
+                // Écrire le numéro
+                ctx.font = "bold 12px Arial";
+                ctx.fillStyle = color;
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                ctx.fillText(number.toString(), midX + perpX, midY + perpY);
+            }
+
+            // Fonction pour mettre à jour le menu déroulant des points de départ
+            function updateStartNodeSelect(selectId = "start-node") {
+                const select = document.getElementById(selectId);
+                select.innerHTML = '<option value="">Point de départ...</option>';
+                nodes.forEach(node => {
+                    const option = document.createElement('option');
+                    option.value = node.id;
+                    option.textContent = `Nœud ${node.label}`;
+                    select.appendChild(option);
+                });
+            }
+
+            // Fonction pour vérifier si un cycle hamiltonien est possible
+            function canBeHamiltonian() {
+                // Vérification basique : chaque sommet doit avoir au moins 2 voisins
+                for (let node of nodes) {
+                    const degree = edges.filter(e => 
+                        e.source === node.id || e.target === node.id
+                    ).length;
+                    if (degree < 2) {
+                        updateResult('Le graphe ne peut pas avoir de cycle hamiltonien (certains sommets ont moins de 2 voisins).', 'warning');
+                        return false;
+                    }
+                }
+                updateResult('Le graphe peut avoir un cycle hamiltonien ! (condition nécessaire mais non suffisante)', 'success');
+                return true;
+            }
+
+            // Fonction pour trouver un cycle hamiltonien (algorithme de backtracking)
+            function findHamiltonianCycle(startNodeId) {
+                // Réinitialiser les étapes
+                coloringSteps = [];
+                currentStepIndex = -1;
+
+                // Si aucun sommet n'est sélectionné, prendre le premier
+                if (startNodeId === undefined || startNodeId === "") {
+                    startNodeId = nodes[0].id;
+                }
+
+                const path = [startNodeId];
+                const visited = new Set([startNodeId]);
+
+                // Ajouter l'étape initiale
+                coloringSteps.push({
+                    description: `Début de la recherche au sommet ${startNodeId}`,
+                    path: [...path]
+                });
+
+                function isAdjacent(node1, node2) {
+                    return edges.some(e => 
+                        (e.source === node1 && e.target === node2) || 
+                        (e.source === node2 && e.target === node1)
+                    );
+                }
+
+                function findCycle(path, visited) {
+                    if (path.length === nodes.length) {
+                        // Vérifier si le dernier sommet est connecté au premier
+                        if (isAdjacent(path[path.length - 1], path[0])) {
+                            path.push(path[0]); // Fermer le cycle
+                            coloringSteps.push({
+                                description: `Cycle hamiltonien trouvé !`,
+                                path: [...path]
+                            });
+                            return true;
+                        }
+                        return false;
+                    }
+
+                    const lastNode = path[path.length - 1];
+                    for (let node of nodes) {
+                        if (!visited.has(node.id) && isAdjacent(lastNode, node.id)) {
+                            path.push(node.id);
+                            visited.add(node.id);
+                            coloringSteps.push({
+                                description: `Ajout du sommet ${node.id} au chemin`,
+                                path: [...path]
+                            });
+
+                            if (findCycle(path, visited)) {
+                                return true;
+                            }
+
+                            path.pop();
+                            visited.delete(node.id);
+                            coloringSteps.push({
+                                description: `Retrait du sommet ${node.id} (backtracking)`,
+                                path: [...path]
+                            });
+                        }
+                    }
+                    return false;
+                }
+
+                if (findCycle(path, visited)) {
+                    return path;
+                }
+                
+                coloringSteps.push({
+                    description: `Aucun cycle hamiltonien trouvé`,
+                    path: []
+                });
+                return null;
+            }
+
+            // Modification de la fonction redrawCanvas
+            function redrawCanvas() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // Dessiner les arêtes
+                edges.forEach(edge => {
+                    const source = nodes.find(n => n.id === edge.source);
+                    const target = nodes.find(n => n.id === edge.target);
+                    
+                    if (source && target) {
+                        ctx.beginPath();
+                        ctx.moveTo(source.x, source.y);
+                        ctx.lineTo(target.x, target.y);
+                        ctx.strokeStyle = "#666";
+                        ctx.lineWidth = 2;
+                        ctx.stroke();
+                    }
+                });
+                
+                // Dessiner le chemin eulérien si disponible
+                if (isShowingPath && eulerianPath.length > 0) {
+                    ctx.lineWidth = 3;
+                    ctx.setLineDash([5, 5]);
+                    
+                    for (let i = 0; i < eulerianPath.length - 1; i++) {
+                        const currentNode = nodes.find(n => n.id === eulerianPath[i]);
+                        const nextNode = nodes.find(n => n.id === eulerianPath[i + 1]);
+                        drawArrow(currentNode.x, currentNode.y, nextNode.x, nextNode.y, i + 1, "#ff0000");
+                    }
+                    
+                    ctx.setLineDash([]);
+                }
+                
+                // Dessiner le cycle hamiltonien si disponible
+                if (isShowingHamiltonianCycle && hamiltonianCycle && hamiltonianCycle.length > 0) {
+                    ctx.lineWidth = 3;
+                    ctx.setLineDash([5, 5]);
+                    
+                    for (let i = 0; i < hamiltonianCycle.length - 1; i++) {
+                        const currentNode = nodes.find(n => n.id === hamiltonianCycle[i]);
+                        const nextNode = nodes.find(n => n.id === hamiltonianCycle[i + 1]);
+                        drawArrow(currentNode.x, currentNode.y, nextNode.x, nextNode.y, i + 1, "#00ff00");
+                    }
+                    
+                    ctx.setLineDash([]);
+                }
+                
+                // Dessiner les nœuds
+                nodes.forEach(node => {
+                    // Cercle du nœud
+                    ctx.beginPath();
+                    ctx.arc(node.x, node.y, nodeRadius, 0, 2 * Math.PI);
+                    
+                    // Remplir avec la couleur assignée ou blanc
+                    if (node.id in colors) {
+                        ctx.fillStyle = colorPalette[colors[node.id] % colorPalette.length];
+                    } else {
+                        ctx.fillStyle = "#fff";
+                    }
+                    
+                    ctx.fill();
+                    ctx.strokeStyle = "#333";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    
+                    // Étiquette du nœud
+                    ctx.font = "14px Arial";
+                    ctx.fillStyle = node.id in colors ? "#fff" : "#333";
+                    ctx.textAlign = "center";
+                    ctx.textBaseline = "middle";
+                    ctx.fillText(node.label, node.x, node.y);
+                    
+                    // Highlight pour les nœuds sélectionnés
+                    if ((currentMode === "add-edge" && selectedEdgeStart && selectedEdgeStart.id === node.id) ||
+                        (currentMode === "move" && draggingNode && draggingNode.id === node.id)) {
+                        ctx.beginPath();
+                        ctx.arc(node.x, node.y, nodeRadius + 5, 0, 2 * Math.PI);
+                        ctx.strokeStyle = "#007bff";
+                        ctx.lineWidth = 2;
+                        ctx.stroke();
+                    }
+                });
+            }
+            
+            // Ajout des écouteurs d'événements pour les nouveaux boutons
+            document.getElementById("btn-check-hamilton").addEventListener("click", () => {
+                if (canBeHamiltonian()) {
+                    updateStartNodeSelect("start-node-hamilton");
+                    document.getElementById("btn-find-hamilton").disabled = false;
+                    document.getElementById("start-node-hamilton").disabled = false;
+                    alert("Le graphe peut avoir un cycle hamiltonien ! (condition nécessaire mais non suffisante)");
+                } else {
+                    alert("Le graphe ne peut pas avoir de cycle hamiltonien (certains sommets ont moins de 2 voisins).");
+                    document.getElementById("btn-find-hamilton").disabled = true;
+                    document.getElementById("start-node-hamilton").disabled = true;
+                }
+            });
+
+            document.getElementById("btn-find-hamilton").addEventListener("click", () => {
+                const startNodeSelect = document.getElementById("start-node-hamilton");
+                const startNodeId = startNodeSelect.value ? parseInt(startNodeSelect.value) : undefined;
+                hamiltonianCycle = findHamiltonianCycle(startNodeId);
+                if (hamiltonianCycle) {
+                    isShowingHamiltonianCycle = true;
+                    document.getElementById("btn-clear-hamilton").disabled = false;
+                    currentStepIndex = coloringSteps.length - 1;
+                    updateAlgorithmSteps();
+                    redrawCanvas();
+                } else {
+                    alert("Aucun cycle hamiltonien trouvé à partir de ce sommet.");
+                }
+            });
+
+            document.getElementById("btn-clear-hamilton").addEventListener("click", () => {
+                hamiltonianCycle = null;
+                isShowingHamiltonianCycle = false;
+                document.getElementById("btn-clear-hamilton").disabled = true;
+                redrawCanvas();
+            });
+
+            // Initialisation
+            setMode("add-node");
+            updateNodeInfo();
+            redrawCanvas();
+
+            // Fonction pour mettre à jour le résultat
+            function updateResult(message, type = 'info') {
+                const resultContent = document.getElementById('result-content');
+                const colorLegend = document.getElementById('color-legend');
+                
+                // Effacer le contenu précédent
+                resultContent.innerHTML = '';
+                colorLegend.innerHTML = '';
+                
+                // Créer le message
+                const messageElement = document.createElement('p');
+                messageElement.className = `mb-0 text-${type}`;
+                messageElement.innerHTML = message;
+                resultContent.appendChild(messageElement);
+            }
+
+            // Fonction pour afficher la légende des couleurs
+            function updateColorLegend() {
+                const colorLegend = document.getElementById('color-legend');
+                colorLegend.innerHTML = '';
+                
+                if (Object.keys(colors).length > 0) {
+                    const uniqueColors = new Set(Object.values(colors));
+                    const legendTitle = document.createElement('h6');
+                    legendTitle.textContent = 'Légende des couleurs :';
+                    colorLegend.appendChild(legendTitle);
+                    
+                    const legendList = document.createElement('div');
+                    legendList.className = 'd-flex flex-wrap gap-2';
+                    
+                    uniqueColors.forEach(color => {
+                        const colorItem = document.createElement('div');
+                        colorItem.className = 'd-flex align-items-center me-3';
+                        
+                        const colorBox = document.createElement('div');
+                        colorBox.className = 'color-indicator me-2';
+                        colorBox.style.backgroundColor = colorPalette[color % colorPalette.length];
+                        
+                        const colorLabel = document.createElement('span');
+                        colorLabel.textContent = `Couleur ${color}`;
+                        
+                        colorItem.appendChild(colorBox);
+                        colorItem.appendChild(colorLabel);
+                        legendList.appendChild(colorItem);
+                    });
+                    
+                    colorLegend.appendChild(legendList);
+                }
+            }
+        });
+    </script>
+
+    <!-- Modal Explication -->
+    <div class="modal fade" id="explanationModal" tabindex="-1" aria-labelledby="explanationModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header bg-info text-white">
+                    <h5 class="modal-title" id="explanationModalLabel">
+                        <i class="fas fa-lightbulb me-2"></i>Explication Simplifiée
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <h4>Le Problème du Voyageur de Commerce (TSP)</h4>
+                    <p>Imaginons un voyageur qui doit visiter plusieurs villes. Il a trois conditions :</p>
+                    <ol>
+                        <li>Visiter chaque ville une seule fois.</li>
+                        <li>Revenir à son point de départ.</li>
+                        <li>Trouver le chemin le plus court.</li>
+                    </ol>
+                    <p>L'objectif du Problème du Voyageur de Commerce (TSP) est de déterminer quel chemin (parmi tous les chemins possibles) est le plus court, en respectant ces trois conditions.</p>
+
+                    <h4 class="mt-4">Pourquoi c'est compliqué ?</h4>
+                    <div class="alert alert-info">
+                        <p>Le problème est difficile car le nombre de solutions possibles augmente très vite avec le nombre de villes. Par exemple :</p>
+                        <ul>
+                            <li>Avec 5 villes, il y a 24 chemins possibles.</li>
+                            <li>Avec 10 villes, il y en a 362.880.</li>
+                            <li>Avec 20 villes, il y a 121.645.100.408.832.000 chemins possibles.</li>
+                        </ul>
+                    </div>
+                    <p>Cette explosion combinatoire rend la recherche de la solution exacte très difficile dès que le nombre de villes devient grand. Cela rend le problème intraitable avec les méthodes classiques de calcul, d'où le nom "problème NP-complet".</p>
+
+                    <h4 class="mt-4">Que signifie NP-complet ?</h4>
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h5>Voici une explication simplifiée :</h5>
+                            <ul>
+                                <li><strong>P</strong> : Ce sont les problèmes pour lesquels on peut trouver une solution rapidement (en temps "polynomial").</li>
+                                <li><strong>NP</strong> : Ce sont des problèmes pour lesquels on peut vérifier une solution rapidement, mais trouver la solution peut prendre un temps énorme.</li>
+                                <li><strong>NP-complet</strong> : Ce sont les problèmes les plus difficiles dans NP. Si on trouve une méthode pour résoudre un problème NP-complet rapidement, on pourrait résoudre tous les autres problèmes NP rapidement.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h4 class="mt-4">La réduction entre problèmes</h4>
+                    <div class="alert alert-secondary">
+                        <p>L'idée de la réduction est de transformer un problème difficile en un autre problème difficile pour montrer que résoudre l'un des deux implique de résoudre l'autre.</p>
+                        <p>Si on peut résoudre 3-SAT (en vérifiant une formule logique), on peut aussi résoudre le cycle hamiltonien (trouver le chemin optimal dans le TSP).</p>
+                    </div>
+
+                    <h4 class="mt-4">Implications pratiques</h4>
+                    <ul class="list-group mb-4">
+                        <li class="list-group-item">Les solutions exactes sont impraticables pour de grandes tailles</li>
+                        <li class="list-group-item">Si P ≠ NP, alors il n'existera probablement pas de solution rapide</li>
+                        <li class="list-group-item">On utilise souvent des heuristiques pour des solutions pratiques</li>
+                    </ul>
+
+                    <h4 class="mt-4">Questions pièges à comprendre</h4>
+                    <div class="accordion" id="questionsAccordion">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#q1">
+                                    Que veut dire "NP-complet" ?
+                                </button>
+                            </h2>
+                            <div id="q1" class="accordion-collapse collapse show" data-bs-parent="#questionsAccordion">
+                                <div class="accordion-body">
+                                    Cela signifie que c'est un des problèmes les plus difficiles à résoudre. Il est dans NP, et si on arrive à le résoudre en temps raisonnable, on pourrait résoudre tous les autres problèmes dans NP.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#q2">
+                                    Pourquoi l'algorithme exact pour le TSP est impraticable ?
+                                </button>
+                            </h2>
+                            <div id="q2" class="accordion-collapse collapse" data-bs-parent="#questionsAccordion">
+                                <div class="accordion-body">
+                                    Parce que le nombre de solutions possibles croît de manière exponentielle. Par exemple, pour 20 villes, il y aurait plus de 121 trillions de possibilités, ce qui prendrait un temps infini à explorer.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#q3">
+                                    Que peut-on dire sur les heuristiques pour le TSP ?
+                                </button>
+                            </h2>
+                            <div id="q3" class="accordion-collapse collapse" data-bs-parent="#questionsAccordion">
+                                <div class="accordion-body">
+                                    Les heuristiques permettent d'obtenir des solutions rapides mais approximatives, sans garantir qu'elles soient optimales. Par exemple, un algorithme de plus proche voisin donne une solution rapide mais pas forcément la meilleure.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Aide Outil -->
+    <div class="modal fade" id="toolHelpModal" tabindex="-1" aria-labelledby="toolHelpModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="toolHelpModalLabel">
+                        <i class="fas fa-question-circle me-2"></i>Aide sur l'outil interactif
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card mb-3">
+                                <div class="card-header bg-primary text-white">
+                                    <i class="fas fa-edit me-2"></i>Manipulation du Graphe
+                                </div>
+                                <div class="card-body">
+                                    <ul class="list-unstyled">
+                                        <li class="mb-2">
+                                            <i class="fas fa-plus-circle text-success me-2"></i>
+                                            <strong>Ajouter un nœud</strong>
+                                            <p class="small text-muted">Cliquez sur le canvas pour ajouter un nœud</p>
+                                        </li>
+                                        <li class="mb-2">
+                                            <i class="fas fa-link text-primary me-2"></i>
+                                            <strong>Ajouter une arête</strong>
+                                            <p class="small text-muted">Sélectionnez deux nœuds pour les relier</p>
+                                        </li>
+                                        <li class="mb-2">
+                                            <i class="fas fa-arrows-alt text-info me-2"></i>
+                                            <strong>Déplacer un nœud</strong>
+                                            <p class="small text-muted">Glissez-déposez les nœuds pour les repositionner</p>
+                                        </li>
+                                        <li class="mb-2">
+                                            <i class="fas fa-trash text-danger me-2"></i>
+                                            <strong>Supprimer</strong>
+                                            <p class="small text-muted">Cliquez sur un nœud ou une arête pour le supprimer</p>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="card mb-3">
+                                <div class="card-header bg-success text-white">
+                                    <i class="fas fa-palette me-2"></i>Coloration de Graphe
+                                </div>
+                                <div class="card-body">
+                                    <ul class="list-unstyled">
+                                        <li class="mb-2">
+                                            <i class="fas fa-palette text-success me-2"></i>
+                                            <strong>Coloration</strong>
+                                            <p class="small text-muted">Cliquez sur "Colorier" pour lancer l'algorithme</p>
+                                        </li>
+                                        <li class="mb-2">
+                                            <i class="fas fa-step-forward text-primary me-2"></i>
+                                            <strong>Pas à pas</strong>
+                                            <p class="small text-muted">Utilisez "Étape suivante" pour suivre l'algorithme</p>
+                                        </li>
+                                        <li class="mb-2">
+                                            <i class="fas fa-sort-amount-down text-warning me-2"></i>
+                                            <strong>Heuristique</strong>
+                                            <p class="small text-muted">Activez l'option du degré décroissant pour une meilleure coloration</p>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="card mb-3">
+                                <div class="card-header bg-info text-white">
+                                    <i class="fas fa-route me-2"></i>Cycle Eulérien
+                                </div>
+                                <div class="card-body">
+                                    <ul class="list-unstyled">
+                                        <li class="mb-2">
+                                            <i class="fas fa-check-circle text-success me-2"></i>
+                                            <strong>Vérification</strong>
+                                            <p class="small text-muted">Cliquez sur "Eulérien" pour vérifier si un cycle existe</p>
+                                        </li>
+                                        <li class="mb-2">
+                                            <i class="fas fa-search text-primary me-2"></i>
+                                            <strong>Recherche</strong>
+                                            <p class="small text-muted">Choisissez un point de départ et cliquez sur la loupe</p>
+                                        </li>
+                                        <li class="mb-2">
+                                            <i class="fas fa-times text-danger me-2"></i>
+                                            <strong>Effacer</strong>
+                                            <p class="small text-muted">Utilisez le bouton X pour effacer le cycle</p>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="card mb-3">
+                                <div class="card-header bg-info text-white">
+                                    <i class="fas fa-map-marked-alt me-2"></i>Cycle Hamiltonien
+                                </div>
+                                <div class="card-body">
+                                    <ul class="list-unstyled">
+                                        <li class="mb-2">
+                                            <i class="fas fa-check-circle text-success me-2"></i>
+                                            <strong>Vérification</strong>
+                                            <p class="small text-muted">Cliquez sur "Hamiltonien" pour vérifier si un cycle est possible</p>
+                                        </li>
+                                        <li class="mb-2">
+                                            <i class="fas fa-search text-primary me-2"></i>
+                                            <strong>Recherche</strong>
+                                            <p class="small text-muted">Choisissez un point de départ et cliquez sur la loupe</p>
+                                        </li>
+                                        <li class="mb-2">
+                                            <i class="fas fa-times text-danger me-2"></i>
+                                            <strong>Effacer</strong>
+                                            <p class="small text-muted">Utilisez le bouton X pour effacer le cycle</p>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info mt-3">
+                        <h6><i class="fas fa-lightbulb me-2"></i>Conseils</h6>
+                        <ul>
+                            <li>Commencez par créer un graphe simple pour tester les fonctionnalités</li>
+                            <li>Observez les étapes d'exécution dans le panneau de droite</li>
+                            <li>Utilisez le mode pas à pas pour comprendre les algorithmes</li>
+                            <li>Comparez les résultats avec et sans l'heuristique du degré</li>
+                        </ul>
+                    </div>
+
+                    <div class="alert alert-warning mt-3">
+                        <h6><i class="fas fa-exclamation-triangle me-2"></i>Attention</h6>
+                        <ul>
+                            <li>Un cycle eulérien nécessite que tous les sommets aient un degré pair</li>
+                            <li>Un cycle hamiltonien nécessite que chaque sommet ait au moins 2 voisins</li>
+                            <li>La coloration nécessite que le graphe soit connexe</li>
+                            <li>Les grands graphes peuvent ralentir les algorithmes</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
